@@ -3,8 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <title>Index page</title>
+
+    <script src="static/atrament.min.js"></script>
+
+    <script type="text/javascript">
+      function onLoad() {
+        window.sketcher = atrament('#mySketcher', 100, 100, 'black');
+        window.sketcher.weight = 5;
+      }
+      function submitImage() {
+        document.imageForm.imageData.value = window.sketcher.toImage().replace("data:image/png;base64,", "");
+        document.imageForm.submit();
+      }
+    </script>
+
+    <style>
+        .prediction-container {
+            vertical-align: bottom;
+        }
+        .submitted-image {
+            border: black solid 1px;
+        }
+        .prediction {
+            display: inline-block;
+        }
+
+    </style>
+
 </head>
-<body>
-The hostname of the container is <b>{{ hostname }}</b> and its IP is <b>{{ ip }}</b>.
+<body onload="onLoad()">
+
+<h1>Keras Number Predictor</h1>
+
+{% if prediction %}
+<h2>Prediction</h2>
+    <div class="prediction-container">
+        <img class="submitted-image" src="data:image/gif;base64,{{ image_data }}" alt="Probably a {{ prediction }}" >
+        <span class="prediction">This digit looks like a {{ prediction }}.</span>
+    </div>
+{% endif %}
+
+<h2 style="clear: both">Draw a digit</h2>
+<canvas id="mySketcher" width="100px" height="100px" style="border: black solid 1px">
+</canvas>
+<p>
+    <button id="clear-canvas" onclick="window.sketcher.clear()">Clear</button>
+    <button id="submit-number" onclick="submitImage()">Submit</button>
+</p>
+
+<form id="imageForm" name="imageForm" action="#" method="post">
+    <input id="imageData" type="text" name="imageData" size="128">
+</form>
+
 </body>
 </html>
