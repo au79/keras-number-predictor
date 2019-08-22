@@ -1,18 +1,18 @@
-# python-flask-docker
-Basic Python Flask app in Docker which prints the hostname and IP of the container
+# keras-number-predictor
+Basic Python Flask app in Docker which uses Keras to load a neural network model and predict handwritten numbers with it.
 
 ### Build application
 Build the Docker image manually by cloning the Git repo.  Dependencies must be in a file at the project root, named `requirements.txt`.
 ```
-$ git clone https://github.com/au79/python-flask-docker.git
-$ cd python-flask-docker
-$ docker build -t au79/python-flask-docker .
+$ git clone https://github.com/au79/keras-number-predictor.git
+$ cd keras-number-predictor
+$ docker build -t au79/keras-number-predictor .
 ```
 
 ### Run the container
 Create a container from the image.  Bind mount your `app` directory t `/app` on the server.
 ```
-$ docker run --name my-container -d -p 5000:5000 -v "$(pwd)/app":/app au79/python-flask-docker
+$ docker run --name keras-number-predictor -d -p 5000:5000 -v "$(pwd)/app":/app au79/keras-number-predictor
 ```
 
 Now visit http://localhost:5000
