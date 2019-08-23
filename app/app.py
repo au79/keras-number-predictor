@@ -32,8 +32,9 @@ def index():
         host_ip = socket.gethostbyname(host_name)
         return render_template('index.html',
                                hostname=host_name, ip=host_ip, prediction=prediction, image_data=image_data)
-    except:
-        return render_template('error.html')
+    except Exception as e:
+        app.logger.info(e.__class__.__name__ + ': ' + str(e))
+        return render_template('error.html', exception=e)
 
 
 def init_model():
