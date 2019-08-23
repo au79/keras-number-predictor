@@ -1,40 +1,47 @@
 from flask import Flask
-from PIL import Image, ImageOps
-import io, binascii
-from keras.preprocessing.image import img_to_array
-from keras.applications import imagenet_utils
-import numpy as np
+from PIL import Image, ImageOps, ImageFilter
+import base64
+import io
+import binascii
 
 app = Flask(__name__)
 
 
-__all__ = ['get_image_from_data_url', 'prepare_image']
+__all__ = ['normalize_image', 'get_data_uri']
 
 
-def get_image_from_data_url(image_data=None):
+def normalize_image(image_data=None):
     if image_data is None:
         raise TypeError('Image data must not be None')
 
-    file_bytes = io.BytesIO(binascii.a2b_base64(image_data))
-    image = Image.open(file_bytes)
+    # The received image data in an PNG file in RGB format, encoded in base 64.
+    image_from_data = Image.open(io.BytesIO(binascii.a2b_base64(image_data)))
 
-    # if the image mode is not RGB, convert it
-    if image.mode != "L":
-        image = image.convert("L")
-    
-    return ImageOps.invert(image)
+    # Create a new, all-white image.
+    normalized_image = Image.new("RGB", image_from_data.size, "white")
+    # Paste the submitted drawing on to it.
+    normalized_image.paste(image_from_data, (0, 0), image_from_data)
+    # Convert to greyscale
+    normalized_image = normalized_image.convert('L')
+    # Soften the edges a bit
+    normalized_image = normalized_image.filter(ImageFilter.GaussianBlur(radius=1))
+
+    # Resize to MNIST image size.
+    normalized_image = normalized_image.resize((28, 28))
+    # Invert to match MNIST: white digits on a black background.
+    normalized_image = ImageOps.invert(normalized_image)
+
+    return normalized_image
 
 
-def prepare_image(image, target):
-    # resize the input image and preprocess it
-    image = image.resize(target)
-    image_array = img_to_array(image)
-    image_array = np.expand_dims(image, axis=0)
-    image_array = imagenet_utils.preprocess_input(image_array)
-    app.logger.info(image_array)
+def get_data_uri(image=None):
+    if image == None:
+        raise TypeError('Image must not be None')
 
-    pixel_count = image_array.shape[1] * image_array.shape[2]
-    image_array = image_array.reshape(image_array.shape[0], pixel_count)
+    prefix = 'data:image/png;base64,'
+    buffer = io.BytesIO()
+    ImageOps.invert(image).save(buffer, format='PNG')
+    encoded_image = base64.b64encode(buffer.getvalue())
+    return encoded_image.decode('ascii')
 
-    # return the processed image
-    return image_array
+

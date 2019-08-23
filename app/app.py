@@ -2,6 +2,8 @@ from flask import Flask, render_template, request
 import socket
 import site_image
 from keras.models import load_model
+import numpy as np
+
 
 app = Flask(__name__)
 
@@ -10,12 +12,21 @@ app = Flask(__name__)
 def index():
     prediction = None
     image_data = None
+    image = None
     if request.method == 'POST':
+        # Get the base64-encoded image data.
         image_data = request.form['imageData']
-        image = site_image.get_image_from_data_url(image_data)
-        image_array = site_image.prepare_image(image, target=(28, 28))
-        predictions = model.predict(image_array)
-        prediction = str(predictions)
+        # Convert it to a PIL Image object, in the correct size and in greyscale.
+        image = site_image.normalize_image(image_data)
+        # Extract and normalize the pixel data
+        pixel_data = np.array(image.getdata()) / 255
+        # Reshape the pixel data to match the model's expected input.
+        pixel_data = np.array([pixel_data])
+
+        predictions = model.predict(pixel_data)
+        prediction = str(predictions.argmax())
+
+        image_data = site_image.get_data_uri(image)
     try:
         host_name = socket.gethostname()
         host_ip = socket.gethostbyname(host_name)
