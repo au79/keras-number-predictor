@@ -1,4 +1,4 @@
-FROM python:3.7-alpine3.10
+FROM gw000/keras
 LABEL maintainer="dev@oolong.com"
 RUN mkdir /app
 WORKDIR /app
