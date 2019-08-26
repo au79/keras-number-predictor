@@ -24,7 +24,7 @@ def normalize_image(image_data=None):
     # Convert to greyscale
     normalized_image = normalized_image.convert('L')
     # Soften the edges a bit
-    normalized_image = normalized_image.filter(ImageFilter.GaussianBlur(radius=1))
+    normalized_image = normalized_image.filter(ImageFilter.GaussianBlur(radius=image_from_data.size[0]/100))
 
     # Resize to MNIST image size.
     normalized_image = normalized_image.resize((28, 28))
