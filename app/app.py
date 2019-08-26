@@ -21,17 +21,16 @@ def index():
         # Extract and normalize the pixel data
         pixel_data = np.array(image.getdata()) / 255
         # Reshape the pixel data to match the model's expected input.
-        pixel_data = np.array([pixel_data])
+        pixel_data = pixel_data.reshape(1, 28, 28, 1)
 
         predictions = model.predict(pixel_data)
         prediction = str(predictions.argmax())
 
+
         image_data = site_image.get_data_uri(image)
+
     try:
-        host_name = socket.gethostname()
-        host_ip = socket.gethostbyname(host_name)
-        return render_template('index.html',
-                               hostname=host_name, ip=host_ip, prediction=prediction, image_data=image_data)
+        return render_template('index.html', prediction=prediction, image_data=image_data)
     except Exception as e:
         app.logger.info(e.__class__.__name__ + ': ' + str(e))
         return render_template('error.html', exception=e)
@@ -39,7 +38,7 @@ def index():
 
 def init_model():
     global model
-    model = load_model('classification_model.h5')
+    model = load_model('convolutional_model.h5')
     model._make_predict_function()
 
 
