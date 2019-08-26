@@ -27,7 +27,11 @@
         .prediction {
             display: inline-block;
         }
-
+        #mySketcher {
+            border: black solid 1px;
+            width: 100px;
+            height: 100px;
+        }
     </style>
 
 </head>
@@ -44,7 +48,7 @@
 {% endif %}
 
 <h2 style="clear: both">Draw a digit</h2>
-<canvas id="mySketcher" width="100px" height="100px" style="border: black solid 1px">
+<canvas id="mySketcher">
 </canvas>
 <p>
     <button id="clear-canvas" onclick="window.sketcher.clear()">Clear</button>
